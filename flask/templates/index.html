@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя HTML-форма</title>
+</head>
+<body>
+    <div>
+        <form id="inputForm" style="text-align: center;">
+            <label for="key">Key:</label>
+            <input type="text" id="key" name="key"><br><br>
+            <label for="value">Value:</label>
+            <input type="text" id="value" name="value"><br><br>
+            <button type="button" id="addButton">Add</button>
+            <button type="button" id="updateButton">Update</button>
+            <button type="button" id="getButton">Get</button>
+            <button type="button" id="getAllButton">GetAllData</button>
+        </form>
+
+        <div id="serverMessageBox" style="text-align: center;"></div>
+
+        <script>
+            console.log("JS Loaded")
+
+            const url = "http://127.0.0.1:8080"
+
+            var inputForm = document.getElementById("inputForm")
+            var addButton = document.getElementById("addButton")
+            var updateButton = document.getElementById("updateButton")
+            var getButton = document.getElementById("getButton")
+
+            addButton.addEventListener("click", (e) => {
+                e.preventDefault()
+                const key = document.getElementById("key").value
+                sendData("POST", "/api", key)
+            })
+
+            updateButton.addEventListener("click", (e) => {
+                e.preventDefault()
+                const key = document.getElementById("key").value
+                sendData("PUT", "/api", key)
+            })
+
+            getButton.addEventListener("click", (e) => {
+                e.preventDefault()
+                const key = document.getElementById("key").value
+                sendData("GET", "/api", key)
+            })
+
+            getAllButton.addEventListener("click", (e) => {
+                e.preventDefault()
+                sendData("GET", "/api/get_all")
+            })
+
+            function sendData(method, target = "/api", key = null) {
+                const value = document.getElementById("value").value
+                let requestUrl = url
+                if (key === null) {
+                    requestUrl += `${target}`
+                } else { 
+                    requestUrl += `${target}?key=${key}`
+                }
+                // }
+                fetch(requestUrl, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: method === "GET" ? null : JSON.stringify({key: key, value: value})
+                }).then(
+                    response => response.text()
+                ).then(
+                    (data) => {
+                        console.log(data)
+                        document.getElementById("serverMessageBox").innerHTML = data
+                    }
+                ).catch(
+                    error => console.error(error)
+                )
+            }
+        </script>
+    </div>
+</body>
+</html>
